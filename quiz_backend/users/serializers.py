@@ -15,23 +15,26 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['username']    = user.username
-        token['email']       = user.email
+        token['username'] = user.username
+        token['email'] = user.email
         token['total_score'] = user.total_score
         return token
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password  = serializers.CharField(write_only=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, label='Confirm password')
+    password = serializers.CharField(
+        write_only=True, validators=[validate_password])
+    password2 = serializers.CharField(
+        write_only=True, label='Confirm password')
 
     class Meta:
-        model  = User
+        model = User
         fields = ['username', 'email', 'password', 'password2']
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({'password': 'Passwords do not match.'})
+            raise serializers.ValidationError(
+                {'password': 'Passwords do not match.'})
         return attrs
 
     def create(self, validated_data):
@@ -42,15 +45,15 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """Read-only public profile (used by leaderboard & other users)."""
-    avatar_url = serializers.SerializerMethodField()
+    avatar = serializers.SerializerMethodField()
 
     class Meta:
-        model  = User
-        fields = ['id', 'username', 'email', 'bio', 'avatar_url',
+        model = User
+        fields = ['id', 'username', 'email', 'bio', 'avatar',
                   'total_score', 'created_at']
         read_only_fields = ['email', 'total_score', 'created_at']
 
-    def get_avatar_url(self, obj):
+    def get_avatar(self, obj):
         request = self.context.get('request')
         if obj.avatar and request:
             return request.build_absolute_uri(obj.avatar.url)
@@ -60,13 +63,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UpdateProfileSerializer(serializers.ModelSerializer):
     """Allows the user to update their own bio and avatar."""
     class Meta:
-        model  = User
+        model = User
         fields = ['username', 'bio', 'avatar']
 
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(write_only=True)
-    new_password = serializers.CharField(write_only=True, validators=[validate_password])
+    new_password = serializers.CharField(
+        write_only=True, validators=[validate_password])
 
     def validate_old_password(self, value):
         user = self.context['request'].user

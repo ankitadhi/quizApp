@@ -36,6 +36,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
 
         <Route
           path="/quizzes"
@@ -69,15 +70,6 @@ function App() {
           element={
             <ProtectedRoute>
               <QuizResults />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/leaderboard"
-          element={
-            <ProtectedRoute>
-              <Leaderboard />
             </ProtectedRoute>
           }
         />
