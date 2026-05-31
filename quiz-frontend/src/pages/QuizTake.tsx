@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { quizAPI } from "../api/endpoints";
-import "../styles/QuizTake.css";
 import type { FC } from "react";
 import type { QuizDetail, UserAnswer } from "../api/endpoints";
 
@@ -115,49 +114,83 @@ export const QuizTake: FC = () => {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  if (loading) return <div className="loading">Loading quiz...</div>;
-  if (error) return <div className="error">{error}</div>;
-  if (!quiz) return <div className="error">Quiz not found</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-lg text-slate-600">Loading quiz...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <div className="card p-8 text-center text-red-600 text-lg">{error}</div>
+      </div>
+    );
+  }
+
+  if (!quiz) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <div className="card p-8 text-center text-red-600 text-lg">
+          Quiz not found
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="quiz-take-container">
-      <div className="quiz-take-header">
-        <div className="quiz-title">
-          <h2>{quiz.title}</h2>
-          <p>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="flex justify-between items-start mb-8">
+        <div>
+          <h2 className="text-3xl font-bold text-slate-900">{quiz.title}</h2>
+          <p className="text-slate-600 mt-2">
             Question {currentQuestionIndex + 1} of {quiz.questions.length}
           </p>
         </div>
-        <div className="quiz-timer">
-          <span className={`time ${(timeLeft || 0) <= 60 ? "warning" : ""}`}>
+        <div className="text-center">
+          <div
+            className={`text-4xl font-bold ${(timeLeft || 0) <= 60 ? "text-red-600" : "text-blue-600"}`}
+          >
             {formatTime(timeLeft)}
-          </span>
+          </div>
+          <p className="text-sm text-slate-600">Time Left</p>
         </div>
       </div>
 
-      <div className="quiz-progress">
+      {/* Progress Bar */}
+      <div className="mb-8 bg-slate-200 rounded-full h-2 overflow-hidden">
         <div
-          className="progress-bar"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 h-full transition-all duration-300"
           style={{
             width: `${((currentQuestionIndex + 1) / quiz.questions.length) * 100}%`,
           }}
         />
       </div>
 
+      {/* Question Container */}
       {currentQuestion && (
-        <div className="question-container">
-          <div className="question-box">
-            <h3 className="question-text">{currentQuestion.text}</h3>
+        <div className="card p-8 mb-8">
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold text-slate-900 mb-4">
+              {currentQuestion.text}
+            </h3>
             {currentQuestion.image && (
               <img
                 src={currentQuestion.image}
                 alt="Question"
-                className="question-image"
+                className="rounded-lg max-h-96 object-cover"
               />
             )}
           </div>
 
-          <div className="choices-container">
+          {/* Choices */}
+          <div className="space-y-3">
             {currentQuestion.choices.map((choice) => {
               const isSelected = answers
                 .get(currentQuestion.id)
@@ -165,7 +198,11 @@ export const QuizTake: FC = () => {
               return (
                 <label
                   key={choice.id}
-                  className={`choice-label ${isSelected ? "selected" : ""}`}
+                  className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition ${
+                    isSelected
+                      ? "border-blue-600 bg-blue-50"
+                      : "border-slate-200 bg-white hover:border-blue-400"
+                  }`}
                 >
                   <input
                     type={
@@ -174,9 +211,11 @@ export const QuizTake: FC = () => {
                     name={`question-${currentQuestion.id}`}
                     checked={isSelected || false}
                     onChange={() => handleChoiceSelect(choice.id)}
-                    className="choice-input"
+                    className="w-5 h-5 cursor-pointer"
                   />
-                  <span className="choice-text">{choice.text}</span>
+                  <span className="ml-3 text-lg text-slate-900 font-medium">
+                    {choice.text}
+                  </span>
                 </label>
               );
             })}
@@ -184,28 +223,30 @@ export const QuizTake: FC = () => {
         </div>
       )}
 
-      <div className="quiz-navigation">
+      {/* Navigation */}
+      <div className="flex justify-between items-center gap-4 flex-wrap">
         <button
           onClick={() =>
             setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))
           }
           disabled={currentQuestionIndex === 0}
-          className="nav-btn"
+          className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           ← Previous
         </button>
 
-        <div className="question-indicators">
+        {/* Question Indicators */}
+        <div className="flex gap-2 flex-wrap justify-center">
           {quiz.questions.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentQuestionIndex(index)}
-              className={`indicator ${
+              className={`w-10 h-10 rounded-full font-bold transition ${
                 index === currentQuestionIndex
-                  ? "current"
+                  ? "bg-blue-600 text-white"
                   : answers.has(quiz.questions[index].id)
-                    ? "answered"
-                    : ""
+                    ? "bg-green-500 text-white"
+                    : "bg-slate-200 text-slate-600 hover:bg-slate-300"
               }`}
               title={`Question ${index + 1}`}
             >
@@ -218,14 +259,14 @@ export const QuizTake: FC = () => {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="submit-btn"
+            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? "Submitting..." : "Submit Quiz"}
+            {submitting ? "⏳ Submitting..." : "✅ Submit Quiz"}
           </button>
         ) : (
           <button
             onClick={() => setCurrentQuestionIndex(currentQuestionIndex + 1)}
-            className="nav-btn"
+            className="btn-primary"
           >
             Next →
           </button>
