@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { quizAPI } from "../api/endpoints";
-import "../styles/QuizList.css";
 import type { Quiz, Category } from "../api/endpoints";
 import type { FC } from "react";
 
@@ -40,106 +39,36 @@ export const QuizList: FC = () => {
     fetchData();
   }, [selectedCategory, difficulty, searchTerm]);
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "easy": return "easy";
-      case "medium": return "medium";
-      case "hard": return "hard";
-      default: return "";
-    }
+  const getDifficultyBadge = (difficulty: string) => {
+    const badges = {
+      easy: { color: "bg-green-100 text-green-800", icon: "🟢" },
+      medium: { color: "bg-yellow-100 text-yellow-800", icon: "🟡" },
+      hard: { color: "bg-red-100 text-red-800", icon: "🔴" },
+    };
+    return badges[difficulty as keyof typeof badges] || badges.medium;
   };
 
-  if (loading) return <div className="loading">Loading quizzes...</div>;
-  if (error) return <div className="error">{error}</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-xl text-slate-600">Loading quizzes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="card p-8 text-center max-w-md">
+          <p className="text-red-600 text-lg font-semibold">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="quiz-list-page">
-      <div className="quiz-header">
-        <h1>Available Quizzes</h1>
-        <p>Challenge yourself with our collection of quizzes</p>
-      </div>
-
-      <div className="quiz-filters">
-        <input
-          type="text"
-          placeholder="Search quizzes..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="search-input"
-        />
-
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="filter-select"
-        >
-          <option value="">All Categories</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.slug}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value)}
-          className="filter-select"
-        >
-          <option value="">All Difficulties</option>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-      </div>
-
-      <div className="quizzes-grid">
-        {quizzes.length > 0 ? (
-          quizzes.map((quiz) => (
-            <div key={quiz.id} className="quiz-card">
-              <div className="quiz-card-header">
-                <h3>{quiz.title}</h3>
-                <span
-                  className={`difficulty-badge ${getDifficultyColor(quiz.difficulty)}`}
-                >
-                  {quiz.difficulty.charAt(0).toUpperCase() +
-                    quiz.difficulty.slice(1)}
-                </span>
-              </div>
-
-              <p className="quiz-description">{quiz.description}</p>
-
-              <div className="quiz-meta">
-                <span className="category-badge">
-                  {quiz.category.icon} {quiz.category.name}
-                </span>
-                <span className="question-count">
-                  {quiz.question_count} Questions
-                </span>
-              </div>
-
-              <div className="quiz-info">
-                <div className="info-item">
-                  <span className="label">Time Limit:</span>
-                  <span className="value">
-                    {Math.floor(quiz.time_limit / 60)}m
-                  </span>
-                </div>
-                <div className="info-item">
-                  <span className="label">Max Score:</span>
-                  <span className="value">{quiz.max_score}</span>
-                </div>
-              </div>
-
-              <Link to={`/quiz/${quiz.id}`} className="start-btn">
-                Start Quiz →
-              </Link>
-            </div>
-          ))
-        ) : (
-          <div className="no-quizzes">No quizzes found</div>
-        )}
-      </div>
-    </div>
-  );
-};
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Header */}\n      <div className=\"mb-12\">\n        <h1 className=\"text-5xl font-bold mb-3 text-slate-900\">🎯 Available Quizzes</h1>\n        <p className=\"text-xl text-slate-600\">Challenge yourself with our collection of quizzes and expand your knowledge</p>\n      </div>\n\n      {/* Filters */}\n      <div className=\"bg-white rounded-xl shadow-md p-6 mb-12\">\n        <div className=\"grid grid-cols-1 md:grid-cols-3 gap-4\">\n          <div>\n            <label className=\"block text-sm font-semibold text-slate-700 mb-2\">🔍 Search</label>\n            <input\n              type=\"text\"\n              placeholder=\"Search quizzes...\"\n              value={searchTerm}\n              onChange={(e) => setSearchTerm(e.target.value)}\n              className=\"input-field\"\n            />\n          </div>\n\n          <div>\n            <label className=\"block text-sm font-semibold text-slate-700 mb-2\">📚 Category</label>\n            <select\n              value={selectedCategory}\n              onChange={(e) => setSelectedCategory(e.target.value)}\n              className=\"input-field\"\n            >\n              <option value=\"\">All Categories</option>\n              {categories.map((cat) => (\n                <option key={cat.id} value={cat.slug}>\n                  {cat.icon} {cat.name}\n                </option>\n              ))}\n            </select>\n          </div>\n\n          <div>\n            <label className=\"block text-sm font-semibold text-slate-700 mb-2\">⚡ Difficulty</label>\n            <select\n              value={difficulty}\n              onChange={(e) => setDifficulty(e.target.value)}\n              className=\"input-field\"\n            >\n              <option value=\"\">All Difficulties</option>\n              <option value=\"easy\">🟢 Easy</option>\n              <option value=\"medium\">🟡 Medium</option>\n              <option value=\"hard\">🔴 Hard</option>\n            </select>\n          </div>\n        </div>\n      </div>\n\n      {/* Quizzes Grid */}\n      {quizzes.length > 0 ? (\n        <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\">\n          {quizzes.map((quiz) => {\n            const badge = getDifficultyBadge(quiz.difficulty);\n            return (\n              <div key={quiz.id} className=\"card p-6 hover:scale-105 transform transition cursor-pointer group\">\n                <div className=\"flex justify-between items-start mb-3\">\n                  <h3 className=\"text-xl font-bold text-slate-900 group-hover:text-blue-600 transition flex-1\">\n                    {quiz.title}\n                  </h3>\n                  <span className={`badge-primary text-xs font-bold ${badge.color} whitespace-nowrap ml-2`}>\n                    {badge.icon} {quiz.difficulty.toUpperCase()}\n                  </span>\n                </div>\n\n                <p className=\"text-slate-600 text-sm mb-4 line-clamp-2\">{quiz.description}</p>\n\n                <div className=\"space-y-3 mb-4\">\n                  <div className=\"flex items-center justify-between text-sm\">\n                    <span className=\"text-slate-600\">\n                      {quiz.category.icon} {quiz.category.name}\n                    </span>\n                    <span className=\"badge-secondary bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs\">\n                      {quiz.question_count} Q\n                    </span>\n                  </div>\n\n                  <div className=\"flex justify-between text-sm text-slate-600\">\n                    <span>⏱️ {Math.floor(quiz.time_limit / 60)}m</span>\n                    <span>⭐ {quiz.max_score} pts</span>\n                  </div>\n                </div>\n\n                <Link to={`/quiz/${quiz.id}`} className=\"btn-primary w-full text-center block\">\n                  Start Quiz →\n                </Link>\n              </div>\n            );\n          })}\n        </div>\n      ) : (\n        <div className=\"card p-12 text-center\">\n          <p className=\"text-2xl text-slate-500 mb-2\">📭 No quizzes found</p>\n          <p className=\"text-slate-400\">Try adjusting your search or filters</p>\n        </div>\n      )}\n    </div>\n  );\n};

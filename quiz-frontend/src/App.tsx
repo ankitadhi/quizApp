@@ -32,50 +32,52 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/leaderboard" element={<Leaderboard />} />
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
 
-        <Route
-          path="/quizzes"
-          element={
-            <ProtectedRoute>
-              <QuizList />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/quizzes"
+            element={
+              <ProtectedRoute>
+                <QuizList />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/quiz/:id"
-          element={
-            <ProtectedRoute>
-              <QuizDetail />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/quiz/:id"
+            element={
+              <ProtectedRoute>
+                <QuizDetail />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/quiz/:id/take"
-          element={
-            <ProtectedRoute>
-              <QuizTake />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/quiz/:id/take"
+            element={
+              <ProtectedRoute>
+                <QuizTake />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/results/:id"
-          element={
-            <ProtectedRoute>
-              <QuizResults />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/results/:id"
+            element={
+              <ProtectedRoute>
+                <QuizResults />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
     </Router>
   );
 }
