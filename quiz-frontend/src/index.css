@@ -2,10 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-gradient-to-br from-slate-50 to-slate-100 text-slate-900;
-  }
+body {
+  background: linear-gradient(
+    to bottom right,
+    rgb(241, 245, 250),
+    rgb(226, 232, 240)
+  );
+  color: rgb(15, 23, 42);
 }
 
 @layer components {
@@ -47,11 +50,5 @@
 
   .badge-danger {
     @apply badge bg-red-100 text-red-800;
-  }
-}
-
-  }
-  button {
-    background-color: #f9f9f9;
   }
 }
